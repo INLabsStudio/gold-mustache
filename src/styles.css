@@ -1,0 +1,169 @@
+@import "tailwindcss";
+@import "@fontsource-variable/fraunces/opsz.css";
+@import "@fontsource-variable/fraunces/opsz-italic.css";
+@import "@fontsource-variable/inter/wght.css";
+
+/* ------------------------------------------------------------------ */
+/* Tokens                                                              */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-ink: #0b0b0a;
+  --color-coal: #121211;
+  --color-graphite: #1b1b1a;
+  --color-smoke: #2a2927;
+  --color-bone: #efeae2;
+  --color-bone-dim: #ddd6ca;
+  --color-stone: #8f8a82;
+  --color-ash: #b9b3a9;
+  --color-gold: #c4a574;
+  --color-gold-soft: #dcc59f;
+  --color-bronze: #765b33;
+
+  --font-serif: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-spin-slow: spin 24s linear infinite;
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+}
+
+@keyframes lb-in { from { opacity: 0; } }
+@keyframes lb-img { from { opacity: 0; transform: scale(0.97); } }
+
+@keyframes marquee {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 72px;
+    -webkit-text-size-adjust: 100%;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+  ::selection { background: var(--color-gold); color: var(--color-ink); }
+  img { max-width: 100%; display: block; }
+  :focus-visible {
+    outline: 1.5px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .on-light :focus-visible { outline-color: var(--color-bronze); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Componentes utilitários                                             */
+/* ------------------------------------------------------------------ */
+@layer components {
+  .container-x {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+  @media (min-width: 768px) { .container-x { padding-inline: 40px; } }
+  @media (min-width: 1280px) { .container-x { padding-inline: 56px; } }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .display {
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    font-weight: 380;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
+  }
+  .display em { font-style: italic; font-weight: 340; }
+
+  .hairline { border-color: color-mix(in oklab, var(--color-bone) 12%, transparent); }
+  .on-light .hairline { border-color: color-mix(in oklab, var(--color-ink) 14%, transparent); }
+
+  /* Grão sutil para profundidade, sem imagem externa */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Arco de espelho de barbearia */
+  .arch { border-radius: 999px 999px 0 0; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion: reveal ao rolar                                             */
+/* ------------------------------------------------------------------ */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.9s var(--ease-out-quart),
+    transform 1.1s var(--ease-out-expo);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+[data-reveal="fade"] { transform: none; }
+[data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Linhas de título que sobem por trás de uma máscara */
+.line-mask { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.line-mask > span {
+  display: inline-block;
+  transform: translate3d(0, 105%, 0);
+  transition: transform 1.2s var(--ease-out-expo);
+  transition-delay: calc(var(--d, 0) * 110ms + 150ms);
+}
+.is-in .line-mask > span, .line-mask.is-in > span { transform: none; }
+
+/* Imagem que "assenta" ao entrar */
+.img-settle img { transform: scale(1.12); transition: transform 1.8s var(--ease-out-expo); }
+.img-settle.is-in img { transform: scale(1); }
+
+/* Traço SVG desenhado */
+.draw path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.8s var(--ease-out-expo) 0.2s; }
+.draw.is-in path { stroke-dashoffset: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  [data-reveal], .line-mask > span, .img-settle img { opacity: 1 !important; transform: none !important; }
+  .draw path { stroke-dashoffset: 0 !important; }
+}
+
+/* Sem JS: tudo visível */
+.no-js [data-reveal], .no-js .line-mask > span { opacity: 1; transform: none; }
+
+/* Esconde a barra de rolagem horizontal em carrosséis com snap */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
